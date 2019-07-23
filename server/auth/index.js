@@ -1,20 +1,22 @@
 const router = require('express').Router();
+const passport = require('passport');
 
 router.get('/login', (req, res) => {
-  res.send('login-page');
+  res.render('index');
 });
 
-router.get('/google', (req, res) => {
-  res.send('login-with-google');
+router.get('/google', passport.authenticate('google', {
+  scope: ['profile'],
+}));
+
+
+router.get('/google/redirect', passport.authenticate('google'), (req, res) => {
+  res.redirect('/profile/');
 });
 
-
-router.get('/google/redirect', (req, res) => {
-  res.send('cb');
-});
-
-router.get('logout', (req, res) => {
-  res.send('loggin out');
+router.get('/logout/', (req, res) => {
+  req.logout();
+  res.redirect('/auth/login/');
 });
 
 module.exports = router;

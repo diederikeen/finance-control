@@ -1,5 +1,19 @@
 import { client } from '../../config/db';
 
+/**
+ * @param {object} category   Category object to be populated
+ * @param {array}  array      Contains a list of transactions within the given category
+ */
+
+function calculateSaldo(category, array) {
+  Object.assign(category, { current_spent: array.reduce((prev, next) => prev + next.value, 0) });
+}
+
+/**
+ * @param {queryObject} query   Query to be executed.
+ * @param {array}       dates   Array of dates which determines the period of transactions
+ */
+
 const getAllCategories = (query, dates) => new Promise((resolve, reject) => {
   const childQuery = {
     text: 'SELECT * FROM transactions WHERE created_at BETWEEN $1::date AND $2::date',
@@ -7,27 +21,20 @@ const getAllCategories = (query, dates) => new Promise((resolve, reject) => {
   };
 
   client.query(query)
-    .then((data) => {
+    .then(({ rows: categories }) => (
       client.query(childQuery)
-        .then(({ rows }) => {
-          data.rows.map((category) => {
-            let totalSpent = 0;
-
-            rows.find((transaction) => {
-              if (transaction.category_id === category.id) {
-                totalSpent += transaction.value;
-              }
-            });
-            Object.assign(category, { current_spent: totalSpent });
-          });
+        .then(({ rows: transactions }) => {
+          categories
+            .map(category => calculateSaldo(
+              category,
+              transactions.filter(transaction => transaction.category_id === category.id),
+            ));
         })
-        .then(() => {
-          resolve({
-            message: 'Retrieved categories',
-            data: data.rows,
-          });
-        });
-    })
+        .then(() => resolve({
+          message: 'Categories succesfully retrieved',
+          data: categories,
+        }))
+    ))
     .catch((error) => {
       reject(error);
     });

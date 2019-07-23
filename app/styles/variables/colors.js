@@ -1,15 +1,12 @@
-import { darken } from 'polished';
+import { darken, lighten } from 'polished';
 // https://flatuicolors.com/palette/ca
 
 const colors = {
-  defaultGreen: '#1dd1a1',
-  darkGreen: darken(0.1, '#1dd1a1'),
-  darkerGreen: darken(0.2, '#1dd1a1'),
-  defaultRed: '#ee5253',
-  darkRed: darken(0.1, '#ee5253'),
-  darkerRed: darken(0.2, '#ee5253'),
-  defaultGrey: '#c8d6e5',
-  darkGrey: darken(0.1, '#c8d6e5'),
+  lightBlue: lighten(0.3, '#22a7f0'),
+  defaultBlue: darken(0.15, '#22a7f0'),
+  darkerBlue: darken(0.3, '#22a7f0'),
+  darkestBlue: darken(0.5, '#22a7f0'),
+  defaultGrey: '#e9e9e9',
 };
 
 export default colors;

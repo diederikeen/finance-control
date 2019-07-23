@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Container } from '../../styles/index';
+import { Container } from '../../styles';
 import CategoryOverview from './modules/CategoryOverview.jsx';
 import TransactionOverview from './modules/TransactionOverview.jsx';
 
