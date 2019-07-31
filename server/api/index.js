@@ -29,9 +29,11 @@ function formatDate(year, month) {
 }
 
 router.get('/transactions', jsonParser, async (req, res) => {
+  const userId = req.session.passport.user;
+
   const { body: { month, year } } = req;
   const formattedDate = formatDate(year, month);
-  const transactions = await getTransactions(formattedDate);
+  const transactions = await getTransactions(formattedDate, userId);
   res.send(transactions);
 });
 
@@ -64,11 +66,12 @@ router.get('/categories', jsonParser, async (req, res) => {
 });
 
 router.post('/categories', jsonParser, async (req, res) => {
+  const userId = req.session.passport.user;
 
   const query = {
     name: 'insert-category',
-    text: 'INSERT INTO categories(label, max_spent, current_spent) VALUES($1, $2, $3)',
-    values: [req.body.label, req.body.max_spent, req.body.current_spent || 0],
+    text: 'INSERT INTO categories(label, max_spent, current_spent, uid) VALUES($1, $2, $3, $4)',
+    values: [req.body.label, req.body.max_spent, req.body.current_spent || 0, userId],
   };
 
   const createdCategory = await createCategory(query);
@@ -76,6 +79,8 @@ router.post('/categories', jsonParser, async (req, res) => {
 });
 
 router.post('/transaction', jsonParser, async (req, res) => {
+  const userId = req.session.passport.user;
+
   const query = {
     name: 'insert-transaction',
     text: 'INSERT INTO transactions(value, label, description, category_id, recurring, created_at, uid) VALUES($1, $2, $3, $4, $5, $6::date, $7)',
@@ -83,10 +88,10 @@ router.post('/transaction', jsonParser, async (req, res) => {
       req.body.value,
       req.body.label,
       req.body.description,
-      req.body.category_id,
+      parseInt(req.body.category_id, 10),
       req.body.recurring,
       req.body.created_at,
-      req.body.uid,
+      userId,
     ],
   };
 

@@ -1,8 +1,5 @@
 import { client } from '../../config/db';
 
-/**
- * @param {Array} dates   Array of min and max date for transactions to be retrieved
- */
 const getAllTransactions = (dates, id) => {
   const query = {
     name: 'select-all-transactions-from-uid',
